@@ -7,7 +7,6 @@ Gem::Specification.new do |s|
 	s.authors     = ["Sylvain Leclercq"]
 	s.email       = 'maisbiensurqueoui@gmail.com'
 	s.files       = ["lib/jedict.rb"]
-	s.executables.concat nil
 	s.homepage    =
 		'http://www.github.com/de-passage/jedict'
 	s.license       = 'MIT'
