@@ -18,6 +18,7 @@ Its primary purpose is to allow for searches of arbitrary complexity through its
 require "nokogiri"
 
 module JEDICT 
+
 	def self.instanciate_from filename, eager_load
 		raise "Invalid path #{filename}" unless FileTest.exist? filename
 		DictionaryProxy.new(filename, eager_load)
@@ -27,6 +28,9 @@ module JEDICT
 		instanciate_from filename, eager_load
 	end
 
+	def self.new eager_load = false
+		instanciate_from File.join(__dir__, '../assets/jedict'), eager_load
+	end
 
 	class DictionaryProxy 
 
@@ -73,7 +77,7 @@ module JEDICT
 
 	module NodePrinting
 		def to_s
-			JEDICT::format_node self
+			JEDICT::format_node(self).strip
 		end
 	end
 		
@@ -115,8 +119,8 @@ module JEDICT
 			def end_element(name)
 				self.position = parents.pop
 				if name == "entry"
-					position.extend NodePrinting
-					callback.call(position)
+					position[:entry].extend NodePrinting
+					callback.call(position[:entry])
 					self.position = {}
 					self.parents = []
 				end
@@ -125,6 +129,7 @@ module JEDICT
 			def value
 				nil
 			end
+
 		end
 
 		class Full < Entry 
