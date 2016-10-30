@@ -16,7 +16,6 @@ Its primary purpose is to allow for searches of arbitrary complexity through its
 =end 
 
 require "nokogiri"
-require "forwardable"
 
 module JEDICT 
 	def self.instanciate_from filename, eager_load
@@ -42,7 +41,7 @@ module JEDICT
 		end
 
 		def count 
-			@count ||= (@dic.length || JEDICT::load_file(@filename, Parser::Count.new))
+			@count ||= (@dic && @dic.length) || JEDICT::load_file(@filename, Parser::Count.new)
 		end
 
 		def each_entry &blck
@@ -60,12 +59,12 @@ module JEDICT
 	def self.format_node n, pre = ""
 		if n.is_a? Array
 			n.reduce("") do |s, e| 
-				s + pre + format_node(e, pre + " ") 
+				s + pre + format_node(e, pre + "  ") 
 			end
 		elsif n.is_a? Hash
 			n.to_a.reduce("") do |s, e|
 				key, value = *e
-				s + "\n" + pre + key.to_s  + ": " + format_node(value, pre + " ")
+				s + "\n" + pre + ((key == :value) ? "" : key.to_s  + ": ") + format_node(value, pre + "  ")
 			end
 		else 
 			n.to_s
@@ -93,13 +92,17 @@ module JEDICT
 			def start_element(name, attrs)
 				return if name == "JMdict"
 				name = name.to_sym
-				if !self.position[name]
-					self.position[name] = [{}]
+				pos = position[name]
+				if !pos
+					self.position[name] = {}
+				elsif pos.is_a? Array 
+					position[name] << {}
 				else
-					self.position[name] << {}
+					self.position[name] = [pos, {}]
 				end
 				self.parents << position
-				self.position = position[name][-1]
+				self.position = position[name]
+				self.position = position[-1] if position.is_a? Array
 				self.position[:attrs] = attrs.flatten if attrs.flatten.length > 0
 			end
 
