@@ -78,8 +78,17 @@ module JEDICT
   module NodeExtention
     PATHS = {
       meaning: [:sense, :gloss, :value],
-      kanji_representation: [:k_ele, :keb],
-      kana_representation: [:r_ele, :reb],
+      kanji_representation: [:k_ele, :keb, :value],
+      reading_representation: [:r_ele, :reb, :value],
+      kanji_priority: [:k_ele, :ke_pri, :value],
+      reading_priority: [:r_ele, :re_pri, :value],
+      kanji_information: [:k_ele, :ke_inf, :value],
+      reading_information: [:r_ele, :re_inf, :value],
+      sense_information: [:sense, :s_inf, :value],
+      gramatical_position: [:sense, :pos, :value],
+      lexical_field: [:sense, :field, :value],
+      dialect: [:sense, :dial, :value],
+#      primary_meaning: [:sense, :gloss, :pri, :value], # In the documentation but doesn't actually appear in the dictionnary at the time of writing (2017/12/17)
     }
     def to_s
       JEDICT::format_node(self).strip
@@ -96,9 +105,9 @@ module JEDICT
         end
       else
         if node.is_a? Array
-          node.map { |e| elements_at e[path], *args }.compact.flatten
+          node.map { |e| elements_at e[path], *args }.flatten.compact
         elsif node.is_a? Hash
-          elements_at node[path], *args
+          elements_at(node[path], *args).flatten.compact
         else
           []
         end
@@ -119,7 +128,7 @@ module JEDICT
       end
 
       define_method "#{key}_matches?" do |regex|
-        send(key).reduce(false) { |acc, r| acc or r.match(regex) }
+        send(key).reduce(false) { |acc, r| acc and r.match(regex) }
       end
     end
 

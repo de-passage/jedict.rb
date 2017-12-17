@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
 	s.name        = 'jedict'
-	s.version     = '0.1.0'
+	s.version     = '0.2.1'
 	s.date        = '2016-10-30'
 	s.summary     = "JEDICT custom parser"
 	s.description = "Parse the JEDICT and run search operations on the fly or load the entire dictionary in memory"
