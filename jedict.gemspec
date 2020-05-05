@@ -10,5 +10,5 @@ Gem::Specification.new do |s|
 	s.homepage    =
 		'http://www.github.com/de-passage/jedict'
 	s.license       = 'MIT'
-	s.add_runtime_dependency 'nokogiri', '~>1.6.8'
+	s.add_runtime_dependency 'nokogiri', '>=1.10.8'
 end
